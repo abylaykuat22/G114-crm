@@ -17,11 +17,29 @@ public class ApplicationRequestService {
         List<ApplicationRequest> appReqList = applicationRequestRepo.findAll();
         return appReqList.stream()
 //                .filter(appReq -> appReq.isHandled())
-                .sorted(Comparator.comparing(ApplicationRequest::getUserName))
+                .sorted(Comparator.comparing(ApplicationRequest::getCourseName))
                 .toList();
     }
 
     public ApplicationRequest getAppReqById(Long id) {
         return applicationRequestRepo.findById(id).orElse(null);
+    }
+
+    public void addAppReq(ApplicationRequest appReq) {
+        applicationRequestRepo.save(appReq);
+    }
+
+    public void updateHandled(Long id) {
+        ApplicationRequest req = getAppReqById(id);
+        req.setHandled(true);
+        applicationRequestRepo.save(req);
+    }
+
+    public void editAppReq(ApplicationRequest appReq) {
+        applicationRequestRepo.save(appReq);
+    }
+
+    public void deleteAppReqById(Long id) {
+        applicationRequestRepo.deleteById(id);
     }
 }
