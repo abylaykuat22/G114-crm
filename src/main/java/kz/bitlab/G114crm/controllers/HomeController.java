@@ -2,6 +2,7 @@ package kz.bitlab.G114crm.controllers;
 
 import kz.bitlab.G114crm.models.ApplicationRequest;
 import kz.bitlab.G114crm.services.ApplicationRequestService;
+import kz.bitlab.G114crm.services.RoleService;
 import kz.bitlab.G114crm.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
@@ -16,6 +18,8 @@ public class HomeController {
     private ApplicationRequestService applicationRequestService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping("/")
     public String homePage(Model model) {
@@ -53,5 +57,26 @@ public class HomeController {
     public String deleteApplicationRequest(@PathVariable Long id) {
         applicationRequestService.deleteAppReqById(id);
         return "redirect:/";
+    }
+
+    @GetMapping("admin-panel")
+    public String adminPanel(Model model) {
+        model.addAttribute("users", userService.getUsers());
+        model.addAttribute("allRoles", roleService.getRoles());
+        return "admin-panel";
+    }
+
+    @PostMapping("addRole")
+    public String addRoleToUser(@RequestParam(name = "user_id") Long userId,
+        @RequestParam(name = "role_id") Long roleId) {
+        userService.addRoleToUser(userId, roleId);
+        return "redirect:/admin-panel";
+    }
+
+    @PostMapping("deleteRole")
+    public String deleteRoleFromUser(@RequestParam(name = "user_id") Long userId,
+        @RequestParam(name = "role_id") Long roleId) {
+        userService.deleteRoleFromUser(userId, roleId);
+        return "redirect:/admin-panel";
     }
 }
