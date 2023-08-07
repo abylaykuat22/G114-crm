@@ -76,11 +76,10 @@ public class HomeController {
   }
 
   @PostMapping("addRoles")
-  public String addRolesToUser(@RequestParam(name = "role_ids") Set<Long> roleIds,
+  public String addRolesToUser(@RequestParam(name = "role_ids", required = false) Set<Long> roleIds,
       @RequestParam(name = "user_id") Long userId) {
-    System.out.println("asd");
-    userService.addRolesToUser(roleIds, userId);
-    return "redirect:/user-details/"+userId;
+    int result = userService.addRolesToUser(roleIds, userId);
+    return "redirect:/user-details/"+userId + "?error="+result;
   }
 
   @PostMapping("deleteRole")

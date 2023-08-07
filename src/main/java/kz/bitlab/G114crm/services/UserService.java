@@ -52,7 +52,10 @@ public class UserService {
     return userRepository.findById(id).orElse(null);
   }
 
-  public void addRolesToUser(Set<Long> roleIds, Long userId) {
+  public int addRolesToUser(Set<Long> roleIds, Long userId) {
+    if (roleIds == null || roleIds.isEmpty()) {
+      return 1;
+    }
     Set<Role> roles = new HashSet<>();
     for (Long id : roleIds) {
       Role role = roleService.getRoleById(id);
@@ -61,5 +64,6 @@ public class UserService {
     User user = getUserById(userId);
     user.setRoles(roles);
     userRepository.save(user);
+    return 0;
   }
 }
