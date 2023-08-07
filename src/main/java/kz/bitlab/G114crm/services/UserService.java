@@ -1,5 +1,7 @@
 package kz.bitlab.G114crm.services;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import kz.bitlab.G114crm.models.Role;
 import kz.bitlab.G114crm.models.User;
@@ -23,7 +25,7 @@ public class UserService {
   }
 
   public void addRoleToUser(Long userId, Long roleId) {
-    User user = userRepository.findById(userId).orElse(null);
+    User user = getUserById(userId);
     Role role = roleService.getRoleById(roleId);
     if (user == null || role == null) {
       return;
@@ -35,13 +37,28 @@ public class UserService {
   }
 
   public void deleteRoleFromUser(Long userId, Long roleId) {
-    User user = userRepository.findById(userId).orElse(null);
+    User user = getUserById(userId);
     Role role = roleService.getRoleById(roleId);
     if (user == null || role == null) {
       return;
     }
     Set<Role> roles = user.getRoles();
     roles.remove(role);
+    user.setRoles(roles);
+    userRepository.save(user);
+  }
+
+  public User getUserById(Long id) {
+    return userRepository.findById(id).orElse(null);
+  }
+
+  public void addRolesToUser(Set<Long> roleIds, Long userId) {
+    Set<Role> roles = new HashSet<>();
+    for (Long id : roleIds) {
+      Role role = roleService.getRoleById(id);
+      roles.add(role);
+    }
+    User user = getUserById(userId);
     user.setRoles(roles);
     userRepository.save(user);
   }

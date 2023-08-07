@@ -1,5 +1,6 @@
 package kz.bitlab.G114crm.controllers;
 
+import java.util.Set;
 import kz.bitlab.G114crm.models.ApplicationRequest;
 import kz.bitlab.G114crm.services.ApplicationRequestService;
 import kz.bitlab.G114crm.services.RoleService;
@@ -14,69 +15,85 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
-    @Autowired
-    private ApplicationRequestService applicationRequestService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private RoleService roleService;
 
-    @GetMapping("/")
-    public String homePage(Model model) {
-        model.addAttribute("zayavki", applicationRequestService.getAppReqs());
-        model.addAttribute("users", userService.getUsers());
-        return "home";
-    }
+  @Autowired
+  private ApplicationRequestService applicationRequestService;
+  @Autowired
+  private UserService userService;
+  @Autowired
+  private RoleService roleService;
 
-    @GetMapping("details/{id}")
-    public String detailsPage(@PathVariable Long id, Model model) {
-        model.addAttribute("appReq", applicationRequestService.getAppReqById(id));
-        model.addAttribute("users", userService.getUsers());
-        return "details";
-    }
+  @GetMapping("/")
+  public String homePage(Model model) {
+    model.addAttribute("zayavki", applicationRequestService.getAppReqs());
+    model.addAttribute("users", userService.getUsers());
+    return "home";
+  }
 
-    @PostMapping("addAppReq")
-    public String addAppReq(ApplicationRequest appReq) {
-        applicationRequestService.addAppReq(appReq);
-        return "redirect:/";
-    }
+  @GetMapping("details/{id}")
+  public String detailsPage(@PathVariable Long id, Model model) {
+    model.addAttribute("appReq", applicationRequestService.getAppReqById(id));
+    model.addAttribute("users", userService.getUsers());
+    return "details";
+  }
 
-    @PostMapping("updateHandled/{id}")
-    public String updateHandled(@PathVariable Long id) {
-        applicationRequestService.updateHandled(id);
-        return "redirect:/";
-    }
+  @PostMapping("addAppReq")
+  public String addAppReq(ApplicationRequest appReq) {
+    applicationRequestService.addAppReq(appReq);
+    return "redirect:/";
+  }
 
-    @PostMapping("editAppReq")
-    public String editApplicationRequest(ApplicationRequest appReq) {
-        applicationRequestService.editAppReq(appReq);
-        return "redirect:/details/" + appReq.getId();
-    }
+  @PostMapping("updateHandled/{id}")
+  public String updateHandled(@PathVariable Long id) {
+    applicationRequestService.updateHandled(id);
+    return "redirect:/";
+  }
 
-    @PostMapping("deleteAppReq/{id}")
-    public String deleteApplicationRequest(@PathVariable Long id) {
-        applicationRequestService.deleteAppReqById(id);
-        return "redirect:/";
-    }
+  @PostMapping("editAppReq")
+  public String editApplicationRequest(ApplicationRequest appReq) {
+    applicationRequestService.editAppReq(appReq);
+    return "redirect:/details/" + appReq.getId();
+  }
 
-    @GetMapping("admin-panel")
-    public String adminPanel(Model model) {
-        model.addAttribute("users", userService.getUsers());
-        model.addAttribute("allRoles", roleService.getRoles());
-        return "admin-panel";
-    }
+  @PostMapping("deleteAppReq/{id}")
+  public String deleteApplicationRequest(@PathVariable Long id) {
+    applicationRequestService.deleteAppReqById(id);
+    return "redirect:/";
+  }
 
-    @PostMapping("addRole")
-    public String addRoleToUser(@RequestParam(name = "user_id") Long userId,
-        @RequestParam(name = "role_id") Long roleId) {
-        userService.addRoleToUser(userId, roleId);
-        return "redirect:/admin-panel";
-    }
+  @GetMapping("admin-panel")
+  public String adminPanel(Model model) {
+    model.addAttribute("users", userService.getUsers());
+    model.addAttribute("allRoles", roleService.getRoles());
+    return "admin-panel";
+  }
 
-    @PostMapping("deleteRole")
-    public String deleteRoleFromUser(@RequestParam(name = "user_id") Long userId,
-        @RequestParam(name = "role_id") Long roleId) {
-        userService.deleteRoleFromUser(userId, roleId);
-        return "redirect:/admin-panel";
-    }
+  @PostMapping("addRole")
+  public String addRoleToUser(@RequestParam(name = "user_id") Long userId,
+      @RequestParam(name = "role_id") Long roleId) {
+    userService.addRoleToUser(userId, roleId);
+    return "redirect:/admin-panel";
+  }
+
+  @PostMapping("addRoles")
+  public String addRolesToUser(@RequestParam(name = "role_ids") Set<Long> roleIds,
+      @RequestParam(name = "user_id") Long userId) {
+    System.out.println("asd");
+    userService.addRolesToUser(roleIds, userId);
+    return "redirect:/user-details/"+userId;
+  }
+
+  @PostMapping("deleteRole")
+  public String deleteRoleFromUser(@RequestParam(name = "user_id") Long userId,
+      @RequestParam(name = "role_id") Long roleId) {
+    userService.deleteRoleFromUser(userId, roleId);
+    return "redirect:/user-details/"+userId;
+  }
+
+  @GetMapping("user-details/{id}")
+  public String userDetails(@PathVariable Long id, Model model) {
+    model.addAttribute("user", userService.getUserById(id));
+    model.addAttribute("roles", roleService.getRoles());
+    return "user-details";
+  }
 }
